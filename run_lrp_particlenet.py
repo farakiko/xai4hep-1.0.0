@@ -127,7 +127,7 @@ if __name__ == "__main__":
         # explain a single jet
         try:
             R_edges, edge_index = lrp.explain(jet.to(device))
-        except ValueError:
+        except Exception:
             print("jet is not processed correctly so skipping it")
             continue
 
