@@ -79,6 +79,11 @@ if __name__ == "__main__":
         state_dict = torch.load(
             f"{outpath}/weights/best_epoch_weights.pth", map_location=device
         )
+    elif args.model == 0:
+        state_dict = torch.load(
+            f"{outpath}/before_training_weights.pth",
+            map_location=device,
+        )
     else:
         state_dict = torch.load(
             f"{outpath}/weights/before_training_weights_{args.model}.pth",
