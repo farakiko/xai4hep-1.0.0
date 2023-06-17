@@ -3,24 +3,15 @@ import json
 import os
 import os.path as osp
 import pickle as pkl
-import sys
 import time
 import warnings
-from glob import glob
 
-import matplotlib.pyplot as plt
-import mplhep as hep
-import numpy as np
-import pandas as pd
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch_geometric
-from torch_geometric.data import Batch, Data
 from torch_geometric.loader import DataLoader
 
-from explainer import LRP_ParticleNet
-from particlenet import ParticleNet, load_data
+from explainer.lrp_particlenet import LRP_ParticleNet
+from particlenet.model import ParticleNet
+from particlenet.utils import load_data
 
 warnings.filterwarnings("ignore")
 
@@ -50,7 +41,10 @@ parser.add_argument(
     help="Which model to load",
 )
 parser.add_argument(
-    "--dataset", type=str, default="./data/toptagging/", help="path to datafile"
+    "--dataset",
+    type=str,
+    default="./data/toptagging/",
+    help="path to datafile",
 )
 parser.add_argument(
     "--model",
@@ -121,7 +115,6 @@ if __name__ == "__main__":
 
     ti = time.time()
     for i, jet in enumerate(loader):
-
         if i == 100:
             if args.quick:
                 break
@@ -134,7 +127,7 @@ if __name__ == "__main__":
         # explain a single jet
         try:
             R_edges, edge_index = lrp.explain(jet.to(device))
-        except:
+        except ValueError:
             print("jet is not processed correctly so skipping it")
             continue
 

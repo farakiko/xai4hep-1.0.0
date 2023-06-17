@@ -1,22 +1,17 @@
 import json
 import os
-import os.path as osp
 import pickle as pkl
 import shutil
 import sys
-from collections.abc import Sequence
 
-import matplotlib
 import matplotlib.pyplot as plt
 import torch
 from sklearn.metrics import auc, roc_curve
-from torch_geometric.data import Batch
-from torch_geometric.data.data import BaseData
-from torch_geometric.loader import DataListLoader, DataLoader
 
 
-def save_model(args, outpath, model_kwargs, kernel_sizes, fc_size, dropout, depth):
-
+def save_model(
+    args, outpath, model_kwargs, kernel_sizes, fc_size, dropout, depth
+):
     if not args.overwrite and os.path.isfile(
         f"{args.outpath}/{args.model_prefix}/best_epoch_weights.pth"
     ):
@@ -30,13 +25,17 @@ def save_model(args, outpath, model_kwargs, kernel_sizes, fc_size, dropout, dept
     for f in filelist:
         try:
             os.remove(os.path.join(outpath, f))
-        except:
+        except ValueError:
             shutil.rmtree(os.path.join(outpath, f))
 
-    with open(f"{outpath}/model_kwargs.pkl", "wb") as f:  # dump model architecture
+    with open(
+        f"{outpath}/model_kwargs.pkl", "wb"
+    ) as f:  # dump model architecture
         pkl.dump(model_kwargs, f, protocol=pkl.HIGHEST_PROTOCOL)
 
-    with open(f"{outpath}/hyperparameters.json", "w") as fp:  # dump hyperparameters
+    with open(
+        f"{outpath}/hyperparameters.json", "w"
+    ) as fp:  # dump hyperparameters
         json.dump(
             {
                 "n_epochs": args.n_epochs,
@@ -53,7 +52,6 @@ def save_model(args, outpath, model_kwargs, kernel_sizes, fc_size, dropout, dept
 
 
 def load_data(dataset_path, flag, n_files, quick):
-
     if quick:  # use only 1000 events for train
         print(f"--- loading only 1000 events for quick {flag}")
         data = torch.load(f"{dataset_path}/{flag}/processed/data_0.pt")[:1000]
@@ -68,7 +66,6 @@ def load_data(dataset_path, flag, n_files, quick):
 
 def make_roc(y_test, y_score, path):
     fpr, tpr, _ = roc_curve(y_test, y_score)
-    roc_auc = auc(fpr, tpr)
 
     fig, ax = plt.subplots()
     ax.plot(

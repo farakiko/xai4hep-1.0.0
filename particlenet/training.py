@@ -1,35 +1,14 @@
 import json
-import math
 import os
-import os.path as osp
 import pickle as pkl
-import sys
 import time
-from glob import glob
-from typing import Callable, Optional, Union
 
-import h5py
 import matplotlib
 import matplotlib.pyplot as plt
 import mplhep as hep
 import numpy as np
-import pandas as pd
-import sklearn
-import sklearn.metrics
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch_geometric
-from torch import Tensor
-from torch.nn import Linear
-from torch_cluster import knn_graph
-from torch_geometric.data import Batch, Data, Dataset
-from torch_geometric.loader import DataListLoader, DataLoader
-from torch_geometric.nn import EdgeConv, global_mean_pool
-from torch_geometric.nn.conv import MessagePassing
-from torch_geometric.typing import Adj, OptTensor, PairOptTensor, PairTensor
-from torch_geometric.utils import to_dense_adj
-from torch_scatter import scatter
 
 plt.style.use(hep.style.CMS)
 plt.rcParams.update({"font.size": 20})
@@ -69,7 +48,6 @@ def train(multi_gpu, device, model, loader, optimizer):
     losses, t = 0, 0
 
     for batch in loader:
-
         if multi_gpu:
             batch = batch
         else:
@@ -94,7 +72,9 @@ def train(multi_gpu, device, model, loader, optimizer):
 
         losses = losses + loss.detach()
 
-    print(f"Average inference time per batch is {round((t / len(loader)), 3)}s")
+    print(
+        f"Average inference time per batch is {round((t / len(loader)), 3)}s"
+    )
 
     losses = (losses / (len(loader))).cpu().item()
 
@@ -143,7 +123,7 @@ def training_loop(
             break
 
         # training step
-        print(f"---->Initiating a training run")
+        print("---->Initiating a training run")
         model.train()
         losses = train(
             multi_gpu,
@@ -156,7 +136,7 @@ def training_loop(
         losses_train.append(losses)
 
         # validation step
-        print(f"---->Initiating a validation run")
+        print("---->Initiating a validation run")
         model.eval()
         losses = validation_run(multi_gpu, device, model, valid_loader)
 
@@ -173,7 +153,9 @@ def training_loop(
                 state_dict = model.state_dict()
             torch.save(state_dict, f"{outpath}/best_epoch_weights.pth")
 
-            with open(f"{outpath}/best_epoch.json", "w") as fp:  # dump best epoch
+            with open(
+                f"{outpath}/best_epoch.json", "w"
+            ) as fp:  # dump best epoch
                 json.dump({"best_epoch": epoch}, fp)
         else:
             stale_epochs += 1
