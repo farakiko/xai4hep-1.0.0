@@ -9,12 +9,10 @@ import mplhep as hep
 import numpy as np
 import torch
 import torch_geometric
-from run_inference import make_roc
+from model import ParticleNet
 from torch_geometric.loader import DataListLoader, DataLoader
 from training import training_loop
-from utils import load_data, save_model
-
-from particlenet.model import ParticleNet
+from utils import load_data, make_roc, save_model
 
 plt.style.use(hep.style.CMS)
 plt.rcParams.update({"font.size": 20})
