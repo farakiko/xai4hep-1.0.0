@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     # load the testing data
     print("- loading datafiles for lrp studies...")
-    data_test = load_data(args.dataset, "test", 4, args.quick)
+    data_test = load_data(args.dataset, "test", 1, args.quick)
     loader = DataLoader(data_test, batch_size=1, shuffle=True)
 
     # load a pretrained model
