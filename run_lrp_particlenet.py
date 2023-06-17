@@ -9,7 +9,7 @@ import warnings
 import torch
 from torch_geometric.loader import DataLoader
 
-from explainer import LRP_ParticleNet
+from explainer.lrp_particlenet import LRP_ParticleNet
 from particlenet.model import ParticleNet
 from particlenet.utils import load_data
 
