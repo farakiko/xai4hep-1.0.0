@@ -109,7 +109,7 @@ if __name__ == "__main__":
     R_edges_list, edge_index_list = [], []
 
     # to store the input and target for plotting purposes
-    batch_x_list, batch_y_list = [], []
+    batch_y_list = []
     # to store the p4 for plotting purposes
     batch_px_list, batch_py_list, batch_pz_list, batch_E_list = [], [], [], []
 
@@ -131,7 +131,6 @@ if __name__ == "__main__":
             print("jet is not processed correctly so skipping it")
             continue
 
-        batch_x_list.append(jet.x.detach().cpu())
         batch_y_list.append(jet.y.detach().cpu())
 
         # for fast jet
@@ -157,8 +156,6 @@ if __name__ == "__main__":
         )
 
     # store the Rscores in the binder folder for further notebook plotting
-    with open(f"{PATH}/batch_x.pkl", "wb") as handle:
-        pkl.dump(batch_x_list, handle)
     with open(f"{PATH}/batch_y.pkl", "wb") as handle:
         pkl.dump(batch_y_list, handle)
 
