@@ -145,8 +145,8 @@ if __name__ == "__main__":
         batch_pz_list.append(jet.pz.detach().cpu())
         batch_E_list.append(jet.E.detach().cpu())
 
-        R_edges_list.append(R_edges["edge_conv_2"])
-        edge_index_list.append(edge_index["edge_conv_2"])
+        R_edges_list.append(R_edges)
+        edge_index_list.append(edge_index)
 
         print("------------------------------------------------------")
 

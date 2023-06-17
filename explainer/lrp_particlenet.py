@@ -20,8 +20,8 @@ class LRP_ParticleNet:
     def explain(self, input):
         """
         Primary function to call on an LRP instance to start explaining predictions.
-        It registers hooks and runs a forward pass on the input, then it attempts to explain
-        the whole model by looping over EdgeConv blocks.
+        It registers hooks and runs a forward pass on the input, then it attempts to
+        explain the whole model by looping over EdgeConv blocks.
 
         Args:
             input: tensor containing the input sample you wish to explain
@@ -115,9 +115,17 @@ class LRP_ParticleNet:
             )
 
         # detach and put on cpu to save
-        for elem in [self.edge_index, R_edges]:
-            for key, value in elem.items():
-                elem[key] = value.detach().cpu()
+        for key, value in self.edge_index.items():
+            self.edge_index[key] = value.detach().cpu()
+
+        for key, value in R_edges.items():
+            R_edges[key] = value.detach().cpu()
+
+            # sum over the latent features' edge Rscores
+            R_edges[key] = torch.abs(R_edges[key]).sum(axis=1)
+
+            # normalize the sum of edge Rscores of all jets to be 1
+            R_edges[key] = R_edges[key] / sum(R_edges[key])
 
         return R_edges, self.edge_index
 
@@ -153,14 +161,17 @@ class LRP_ParticleNet:
 
     def redistribute_concat_step(self, R_old, idx):
         """
-        Useful to redistribute the R_scores backward from the concatenation step that happens at
-        the begining of the EdgeConv block.
+        Useful to redistribute the R_scores backward from the concatenation step that happens
+        at the begining of the EdgeConv block.
 
-        Function that takes R_old ~ (num_nodes*k, latent_dim)
-        and returns R_new ~ (num_nodes, latent_dim/2)
+        Args
+            R_old ~ (num_nodes*k, latent_dim)
+
+        Returns
+            R_new ~ (num_nodes, latent_dim/2)
 
         Note: latent_dim should be an even number as it is a concat of two node features.
-        Note: Assumes that the concat is [x_i, x_j] not [x_i, x_i-x_j]
+        Note: Assumes that the concat is [x_i, x_j] not [x_i, x_i-x_j].
         """
 
         latent_dim_old = R_old.shape[-1]
@@ -185,8 +196,11 @@ class LRP_ParticleNet:
         Useful to reditsribute the R_scores backward from the averaging of neighboring edges.
         It redistributes R_scores from the nodes over the edges.
 
-        takes R_old ~ (num_nodes, latent_dim) and edge_activations ~ (num_nodes*k, latent_dim)
-        returns R_new ~ (num_nodes*k, latent_dim)
+        Args
+            R_old ~ (num_nodes, latent_dim) and edge_activations ~ (num_nodes*k, latent_dim)
+
+        Returns
+            R_new ~ (num_nodes*k, latent_dim)
         """
 
         latent_dim = R_old.shape[1]
@@ -205,8 +219,7 @@ class LRP_ParticleNet:
                     + self.num_neighbors
                 ].sum(axis=0)
 
-                # redistribute the R_scores of node_i according to how activated each edge_activation was
-                # (normalized by deno)
+                # redistribute the R_scores of node_i according to how activated each edge_activation (normalized by deno)
                 R_new[(i * self.num_neighbors) + j] = (
                     R_old[i]
                     * self.edge_activations[f"edge_conv_{idx}"][
@@ -222,8 +235,11 @@ class LRP_ParticleNet:
         Useful to reditsribute the R_scores backward from the averaging of all nodes.
         It redistributes R_scores from the whole jet over the nodes.
 
-        takes R_old ~ (1, latent_dim)
-        and returns R_new ~ (num_nodes, latent_dim)
+        Args
+            R_old ~ (1, latent_dim)
+
+        Returns
+            R_new ~ (num_nodes, latent_dim)
         """
 
         latent_dim = R_old.shape[1]
@@ -251,8 +267,11 @@ class LRP_ParticleNet:
         Implements the lrp-epsilon rule presented in the following reference: https://doi.org/10.1007/978-3-030-28954-6_10.
         Follows simple DNN LRP redistribution over the Sequential FC layers of a given EdgeConv.
 
-        takes R_old ~ (num_nodes*k, latent_dim_old)
-        and returns R_new ~ (num_nodes*k, latent_dim_new)
+        Args
+            R_old ~ (num_nodes*k, latent_dim_old)
+
+        Returns
+            R_new ~ (num_nodes*k, latent_dim_new)
         """
 
         layer_names = []
