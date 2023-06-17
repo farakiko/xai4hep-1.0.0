@@ -119,7 +119,7 @@ class LRP_ParticleNet:
                 for key, value in elem.items():
                     elem[key] = value.detach().cpu()
 
-            return R_edges["edge_conv_2"], self.edge_index["edge_conv_2"]
+            return R_edges["edge_conv2"], self.edge_index["edge_conv2"]
 
     """
     EdgeConv redistribution
