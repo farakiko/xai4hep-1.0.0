@@ -9,7 +9,7 @@ import warnings
 import torch
 from torch_geometric.loader import DataLoader
 
-from explainer.lrp_particlenet import LRP_ParticleNet
+from explainer import LRP_ParticleNet
 from particlenet.model import ParticleNet
 from particlenet.utils import load_data
 
@@ -140,8 +140,8 @@ if __name__ == "__main__":
         batch_pz_list.append(jet.pz.detach().cpu())
         batch_E_list.append(jet.E.detach().cpu())
 
-        R_edges_list.append(R_edges)
-        edge_index_list.append(edge_index)
+        R_edges_list.append(R_edges["edge_conv_2"])
+        edge_index_list.append(edge_index["edge_conv_2"])
 
         print("------------------------------------------------------")
 
