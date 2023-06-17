@@ -114,12 +114,12 @@ class LRP_ParticleNet:
                 f"R_scores after EdgeConv # {idx}: {round((R_scores.sum()).item(),4)}"
             )
 
-        # detach and put on cpu to save
-        for elem in [self.edge_index, R_edges]:
-            for key, value in elem.items():
-                elem[key] = value.detach().cpu()
+            # detach and put on cpu to save
+            for elem in [self.edge_index, R_edges]:
+                for key, value in elem.items():
+                    elem[key] = value.detach().cpu()
 
-        return R_edges["edge_conv_2"], self.edge_index["edge_conv_2"]
+            return R_edges["edge_conv_2"], self.edge_index["edge_conv_2"]
 
     """
     EdgeConv redistribution
