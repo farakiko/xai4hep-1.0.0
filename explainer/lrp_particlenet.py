@@ -20,8 +20,8 @@ class LRP_ParticleNet:
     def explain(self, input):
         """
         Primary function to call on an LRP instance to start explaining predictions.
-        It registers hooks and runs a forward pass on the input, then it attempts to explain
-        the whole model by looping over EdgeConv blocks.
+        It registers hooks and runs a forward pass on the input, then it attempts to explain the whole
+        model by looping over EdgeConv blocks.
 
         Args:
             input: tensor containing the input sample you wish to explain
@@ -114,12 +114,12 @@ class LRP_ParticleNet:
                 f"R_scores after EdgeConv # {idx}: {round((R_scores.sum()).item(),4)}"
             )
 
-            # detach and put on cpu to save
-            for elem in [self.edge_index, R_edges]:
-                for key, value in elem.items():
-                    elem[key] = value.detach().cpu()
+        # detach and put on cpu to save
+        for elem in [self.edge_index, R_edges]:
+            for key, value in elem.items():
+                elem[key] = value.detach().cpu()
 
-            return R_edges["edge_conv_2"], self.edge_index["edge_conv_2"]
+        return R_edges, self.edge_index
 
     """
     EdgeConv redistribution
@@ -219,8 +219,8 @@ class LRP_ParticleNet:
 
     def redistribute_across_global_pooling(self, R_old):
         """
-        Useful to reditsribute the R_scores backward from the averaging of all nodes.
-        It redistributes R_scores from the whole jet over the nodes.
+        Useful to reditsribute the R_scores backward from the averaging of all nodes. It redistributes
+        R_scores from the whole jet over the nodes.
 
         takes R_old ~ (1, latent_dim)
         and returns R_new ~ (num_nodes, latent_dim)
