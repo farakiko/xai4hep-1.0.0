@@ -114,12 +114,20 @@ class LRP_ParticleNet:
                 f"R_scores after EdgeConv # {idx}: {round((R_scores.sum()).item(),4)}"
             )
 
-        # detach and put on cpu to save
-        for elem in [self.edge_index, R_edges]:
-            for key, value in elem.items():
-                elem[key] = value.detach().cpu()
+            # detach and put on cpu to save
+            for key, value in self.edge_index.items():
+                self.edge_index[key] = value.detach().cpu()
 
-        return R_edges, self.edge_index
+            for key, value in R_edges.items():
+                R_edges[key] = value.detach().cpu()
+
+                # sum over the latent features' edge Rscores
+                R_edges[key] = torch.abs(R_edges[key]).sum(axis=1)
+
+                # normalize the sum of edge Rscores of all jets to be 1
+                R_edges[key] = R_edges[key] / sum(R_edges[key])
+
+            return R_edges["edge_conv_2"], self.edge_index["edge_conv_2"]
 
     """
     EdgeConv redistribution
